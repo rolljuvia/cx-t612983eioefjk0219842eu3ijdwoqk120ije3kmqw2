@@ -14,7 +14,7 @@
     'use strict';
 
     // ★★★ 把这个URL改成你的字卡JSON部署地址 ★★★
-    const CARDS_URL = 'https://rolljuvia.github.io/zika-345678i9o0p1e4dwqaushnji92081/cards.json';
+    const CARDS_URL = '';
 
     const EMOJI_CHANCE = 0.15;
 
@@ -28,8 +28,9 @@
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             remoteCards = await resp.json();
 
-            // 合并聊天字卡
-            if (remoteCards.chat && typeof customReplies !== 'undefined' && customReplies.length === 0) {
+            // 用远程字卡覆盖本地
+            if (remoteCards.chat) {
+                customReplies.length = 0;
                 customReplies.push(...remoteCards.chat);
                 window._customReplies = customReplies;
             }
