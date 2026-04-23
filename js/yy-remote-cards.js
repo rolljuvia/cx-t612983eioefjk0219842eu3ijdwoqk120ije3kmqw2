@@ -419,32 +419,44 @@
         });
     }
 
-    // ========== 每日寄语注入（从神谕池） ==========
-    function injectDailyMotto() {
-        const mottoEl = document.querySelector('.header-motto');
-        if (mottoEl && window._remoteMottos && window._remoteMottos.length > 0) {
-            mottoEl.textContent = window._remoteMottos[Math.floor(Math.random() * window._remoteMottos.length)];
-        }
-    }
-
     // ========== 公告页状态注入 ==========
     function injectDailyStatus() {
         const mood = updateDailyMood();
         const status = getRandomStatus();
 
-        // 尝试注入到公告页
-        setTimeout(() => {
-            // 每日寄语
-            injectDailyMotto();
+        // 等公告页渲染完再注入
+        const tryInject = () => {
+            // 第一行大块"梦角今日状态" → 改成神谕 + 改标题
+            const moodNameEl = document.getElementById('dg-partner-mood');
+            const sectionLabel = document.getElementById('dg-section-label-partner');
+            const moodNoteEl = document.getElementById('dg-partner-mood-note');
+            if (moodNameEl && window._remoteMottos && window._remoteMottos.length > 0) {
+                const motto = window._remoteMottos[Math.floor(Math.random() * window._remoteMottos.length)];
+                moodNameEl.textContent = motto;
+                if (moodNoteEl) moodNoteEl.textContent = '';
+            }
+            if (sectionLabel) {
+                sectionLabel.textContent = '✦ 今日谕示';
+            }
 
-            // 公告页心情状态
-            const moodEls = document.querySelectorAll('.announce-mood, .mood-text, [id*="mood"]');
-            moodEls.forEach(el => {
-                if (el.textContent.includes('还没有记录') || el.textContent.includes('未记录')) {
-                    el.textContent = mood;
-                }
-            });
-        }, 1500);
+            // 第二行右边"梦角的状态" → 保持简短状态
+            const statusEl = document.getElementById('dg-status');
+            if (statusEl) statusEl.textContent = status;
+
+            // 每日寄语（底部引用框）
+            const noteEl = document.getElementById('dg-note-text');
+            if (noteEl && window._remoteMottos && window._remoteMottos.length > 0) {
+                // 用跟第一行不同的一句
+                const pool = [...window._remoteMottos];
+                const picked = pool[Math.floor(Math.random() * pool.length)];
+                noteEl.textContent = picked + ' ✦';
+            }
+        };
+
+        // 公告页可能延迟渲染，多试几次
+        setTimeout(tryInject, 1000);
+        setTimeout(tryInject, 2500);
+        setTimeout(tryInject, 4000);
     }
 
     window.YY_RemoteCards = {
