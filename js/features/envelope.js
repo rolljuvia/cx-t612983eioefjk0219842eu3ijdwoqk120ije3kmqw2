@@ -200,7 +200,7 @@ function renderOutboxList() {
         const statusIcon = isPending
             ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
             : `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-        const statusText = isPending ? `${statusIcon} 预计 ${replyTime} 回信` : `${statusIcon} 已收到回信`;
+        const statusText = isPending ? `${statusIcon} 等待回信中…` : `${statusIcon} 已收到回信`;
         const preview = letter.content.length > 38 ? letter.content.substring(0, 38) + '…' : letter.content;
         return `
         <div class="env-letter-item" onclick="viewEnvLetter('outbox','${letter.id}')">
@@ -437,7 +437,7 @@ function handleSendEnvelope() {
 
     cancelEnvelopeCompose();
     switchEnvTab('outbox');
-    showNotification(`信件已寄出，预计 ${Math.floor(randomMinutes)} 分钟后收到回信 ✉️`, 'success');
+    showNotification('信件已寄出，等待回信中 ✉️', 'success');
 }
 
 // ========== 回信生成时预定牌 ==========
