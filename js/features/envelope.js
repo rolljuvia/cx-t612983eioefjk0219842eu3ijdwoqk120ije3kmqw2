@@ -422,10 +422,11 @@ function handleSendEnvelope() {
         addMessage({ id: Date.now(), sender: 'user', text: `【寄出的信】\n${text}`, timestamp: new Date(), status: 'sent', type: 'normal' });
     }
 
-    // ★★★ 测试模式：5秒即时回信。正式使用时改回 10-24 小时 ★★★
-    const minHours = 0, maxHours = 0;
-    const randomHours = 0;
-    const replyTime = Date.now() + 5000; // 5秒后回信
+    // 回信延迟：从 localStorage 读取自定义设置（单位：分钟）
+    const replyMinMinutes = parseInt(localStorage.getItem('yy_reply_min_minutes')) || 30;
+    const replyMaxMinutes = parseInt(localStorage.getItem('yy_reply_max_minutes')) || 120;
+    const randomMinutes = replyMinMinutes + Math.random() * (replyMaxMinutes - replyMinMinutes);
+    const replyTime = Date.now() + randomMinutes * 60 * 1000;
     const newId = 'env_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
     envelopeData.outbox.push({
         id: newId, content: text,
@@ -436,7 +437,7 @@ function handleSendEnvelope() {
 
     cancelEnvelopeCompose();
     switchEnvTab('outbox');
-    showNotification('信件已寄出，即将收到回信（测试模式）✉️', 'success');
+    showNotification(`信件已寄出，预计 ${Math.floor(randomMinutes)} 分钟后收到回信 ✉️`, 'success');
 }
 
 // ========== 回信生成时预定牌 ==========
@@ -490,8 +491,16 @@ function injectCardFlipButton(letter) {
 
             if (window.YY_RemoteCards && typeof window.YY_RemoteCards.createCardFlipUI === 'function') {
                 window.YY_RemoteCards.createCardFlipUI(document.body, function() {
-                    // 翻完牌回到信件
-                    btnDiv.innerHTML = '<div style="font-size:11px;color:var(--text-secondary);letter-spacing:1px;">✦ 讯息已揭示 ✦</div>';
+                    // 翻完牌后可以再次查看
+                    btnDiv.innerHTML = `
+                        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;letter-spacing:1px;">✦ 讯息已揭示 ✦</div>
+                        <button id="env-re-flip" style="padding:8px 22px;border-radius:18px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);font-family:'Noto Serif SC',serif;font-size:12px;cursor:pointer;letter-spacing:1px;">
+                            再次查看牌面
+                        </button>
+                    `;
+                    document.getElementById('env-re-flip').addEventListener('click', function() {
+                        window.YY_RemoteCards.createCardFlipUI(document.body, function() {}, preCards);
+                    });
                 }, preCards);
             }
         });
