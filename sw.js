@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chuanxun-v2';
+const CACHE_NAME = 'chuanxun-v3';
 
 // 本地文件 - 离线核心缓存
 const LOCAL_FILES = [
@@ -57,20 +57,38 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 拦截请求：优先用缓存，缓存没有再联网
+// 拦截请求：JS和JSON文件走网络优先（保证更新及时），其他走缓存优先
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+
+  // 只处理 GET 请求，跳过 chrome-extension 等非 http(s) 请求
+  if (event.request.method !== 'GET' || !url.startsWith('http')) return;
+
+  // JS 和 JSON 文件：网络优先，失败了再用缓存
+  if (url.endsWith('.js') || url.endsWith('.json')) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 其他文件（CSS、图片等）：缓存优先
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        // 缓存新请求的资源（仅 GET 请求）
-        if (response.ok && event.request.method === 'GET') {
+        if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       }).catch(() => {
-        // 离线且无缓存时的兜底
         if (event.request.destination === 'document') {
           return caches.match('./index.html');
         }
