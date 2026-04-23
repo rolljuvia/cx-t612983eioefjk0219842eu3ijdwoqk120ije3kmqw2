@@ -383,15 +383,68 @@
         injectStyles();
         await loadRemoteCards();
         updateDailyMood();
+        injectDailyStatus();
 
         const wait = setInterval(() => {
             if (typeof window.simulateReply === 'function') {
                 clearInterval(wait);
                 enhanceSimulateReply();
                 overrideEnvelopeReply();
+                initReplyDelaySettings();
                 console.log('[RemoteCards] 初始化完成');
             }
         }, 500);
+    }
+
+    // ========== 回信延迟设置 ==========
+    function initReplyDelaySettings() {
+        const minInput = document.getElementById('yy-reply-delay-min');
+        const maxInput = document.getElementById('yy-reply-delay-max');
+        if (!minInput || !maxInput) return;
+
+        minInput.value = localStorage.getItem('yy_reply_min_minutes') || '30';
+        maxInput.value = localStorage.getItem('yy_reply_max_minutes') || '120';
+
+        minInput.addEventListener('change', function() {
+            let v = parseInt(minInput.value) || 1;
+            if (v < 1) v = 1;
+            minInput.value = v;
+            localStorage.setItem('yy_reply_min_minutes', v);
+        });
+        maxInput.addEventListener('change', function() {
+            let v = parseInt(maxInput.value) || 30;
+            if (v < 1) v = 1;
+            maxInput.value = v;
+            localStorage.setItem('yy_reply_max_minutes', v);
+        });
+    }
+
+    // ========== 每日寄语注入（从神谕池） ==========
+    function injectDailyMotto() {
+        const mottoEl = document.querySelector('.header-motto');
+        if (mottoEl && window._remoteMottos && window._remoteMottos.length > 0) {
+            mottoEl.textContent = window._remoteMottos[Math.floor(Math.random() * window._remoteMottos.length)];
+        }
+    }
+
+    // ========== 公告页状态注入 ==========
+    function injectDailyStatus() {
+        const mood = updateDailyMood();
+        const status = getRandomStatus();
+
+        // 尝试注入到公告页
+        setTimeout(() => {
+            // 每日寄语
+            injectDailyMotto();
+
+            // 公告页心情状态
+            const moodEls = document.querySelectorAll('.announce-mood, .mood-text, [id*="mood"]');
+            moodEls.forEach(el => {
+                if (el.textContent.includes('还没有记录') || el.textContent.includes('未记录')) {
+                    el.textContent = mood;
+                }
+            });
+        }, 1500);
     }
 
     window.YY_RemoteCards = {

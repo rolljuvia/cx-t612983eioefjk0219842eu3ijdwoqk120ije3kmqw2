@@ -792,17 +792,23 @@ if (customIntros && customIntros.length > 0) {
 
 function manageAutoSendTimer() {
     if (autoSendTimer) {
-        clearInterval(autoSendTimer);
+        clearTimeout(autoSendTimer);
         autoSendTimer = null;
     }
     if (settings.autoSendEnabled) {
-        const intervalMs = settings.autoSendInterval * 60 * 1000;
-        
-        autoSendTimer = setInterval(() => {
-            if (!document.body.classList.contains('batch-favorite-mode')) {
-                simulateReply(); 
-            }
-        }, intervalMs);
+        // 随机间隔：5分钟 ~ 2小时
+        function scheduleNextAutoSend() {
+            const minMs = 5 * 60 * 1000;      // 5分钟
+            const maxMs = 120 * 60 * 1000;     // 2小时
+            const randomMs = minMs + Math.random() * (maxMs - minMs);
+            autoSendTimer = setTimeout(() => {
+                if (!document.body.classList.contains('batch-favorite-mode')) {
+                    simulateReply();
+                }
+                if (settings.autoSendEnabled) scheduleNextAutoSend();
+            }, randomMs);
+        }
+        scheduleNextAutoSend();
     }
 }
 
@@ -1670,7 +1676,7 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
             showTypingIndicator();
             let delay = 0;
             const recentUserMsgs = settings.replyEnabled
-                ? messages.filter(m => m.sender === 'user' && m.text).slice(-10)
+                ? messages.filter(m => m.sender === 'user' && m.text).slice(-3)
                 : [];
             for (let i = 0; i < replyCount; i++) {
                 const delayRange = settings.replyDelayMax - settings.replyDelayMin;
