@@ -53,7 +53,21 @@ async function checkEnvelopeStatus() {
     });
     if (changed) {
         saveEnvelopeData();
-        if (newReplyLetter) showEnvelopeReplyPopup(newReplyLetter);
+        if (newReplyLetter) {
+            // 在聊天界面显示居中小字提示（类似拍一拍）
+            if (typeof addMessage === 'function') {
+                const pName = (typeof settings !== 'undefined' && settings.partnerName) || '对方';
+                addMessage({
+                    id: Date.now() + 7777,
+                    sender: 'system',
+                    text: `✉ ${pName} 寄来了一封回信`,
+                    timestamp: new Date(),
+                    status: 'received',
+                    type: 'system'
+                });
+            }
+            showEnvelopeReplyPopup(newReplyLetter);
+        }
     }
 }
 
@@ -340,6 +354,13 @@ window.viewEnvLetter = function(section, id) {
         }
     }
     showModal(document.getElementById('envelope-view-modal'));
+
+    // 如果是收到的回信且有塔罗牌，自动注入翻牌按钮
+    if (section === 'inbox' && letter.preSelectedCards) {
+        setTimeout(() => {
+            injectCardFlipButton(letter);
+        }, 300);
+    }
 };
 
 window.toggleEnvEdit = function() {
