@@ -14,7 +14,7 @@
     'use strict';
 
     // ★★★ 把这个URL改成你的字卡JSON部署地址 ★★★
-    const CARDS_URL = 'https://rolljuvia.github.io/zika-345678i9o0p1e4dwqaushnji92081/';
+    const CARDS_URL = 'https://rolljuvia.github.io/zika-345678i9o0p1e4dwqaushnji92081/cards.json';
 
     const EMOJI_CHANCE = 0.15;
 
