@@ -14,7 +14,7 @@
     'use strict';
 
     // ★★★ 把这个URL改成你的字卡JSON部署地址 ★★★
-    const CARDS_URL = 'https://zika-brilliant-beignet-f72cc8.netlify.app/cards.json';
+    const CARDS_URL = 'https://github.com/rolljuvia/zika-345678i9o0p1e4dwqaushnji92081.git/cards.json';
 
     const EMOJI_CHANCE = 0.15;
 
