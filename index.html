@@ -465,7 +465,7 @@
                 </div>
                 <div class="env-send-info">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span id="env-reply-time-info">对方将在 10-24 小时内回信（8-12 句话）</span>
+                    <span id="env-reply-time-info">回信延迟可在聊天设置中自定义</span>
                 </div>
                 <div style="display:flex;gap:8px;">
                     <button class="modal-btn modal-btn-secondary" id="cancel-compose" onclick="cancelEnvelopeCompose()" style="flex:1;">取消</button>
@@ -1158,6 +1158,20 @@
                                 <input type="range" min="1" max="120" step="1" value="5" class="font-size-slider" id="auto-send-slider">
                                 <span class="cs-slider-val" id="auto-send-value">5分钟</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <p class="cs-group-label" style="margin-top:4px;">回信延迟</p>
+                    <div class="cs-card">
+                        <div style="padding:8px 12px;font-size:12px;color:var(--text-secondary);">
+                            寄信后多久收到回信（单位：分钟）
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;padding:4px 12px 12px;">
+                            <label style="font-size:12px;color:var(--text-secondary);">最短</label>
+                            <input type="number" id="yy-reply-delay-min" min="1" max="1440" style="width:64px;padding:5px 6px;border-radius:10px;border:1px solid var(--border-color);background:var(--primary-bg);color:var(--text-primary);font-size:13px;text-align:center;">
+                            <label style="font-size:12px;color:var(--text-secondary);">最长</label>
+                            <input type="number" id="yy-reply-delay-max" min="1" max="1440" style="width:64px;padding:5px 6px;border-radius:10px;border:1px solid var(--border-color);background:var(--primary-bg);color:var(--text-primary);font-size:13px;text-align:center;">
+                            <span style="font-size:12px;color:var(--text-secondary);">分钟</span>
                         </div>
                     </div>
 
