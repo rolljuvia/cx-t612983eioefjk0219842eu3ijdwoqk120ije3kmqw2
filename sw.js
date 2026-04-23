@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chuanxun-v3';
+const CACHE_NAME = 'chuanxun-v4';
 
 // 本地文件 - 离线核心缓存
 const LOCAL_FILES = [
@@ -64,8 +64,8 @@ self.addEventListener('fetch', event => {
   // 只处理 GET 请求，跳过 chrome-extension 等非 http(s) 请求
   if (event.request.method !== 'GET' || !url.startsWith('http')) return;
 
-  // JS 和 JSON 文件：网络优先，失败了再用缓存
-  if (url.endsWith('.js') || url.endsWith('.json')) {
+  // JS、JSON、HTML 文件：网络优先，失败了再用缓存
+  if (url.endsWith('.js') || url.endsWith('.json') || url.endsWith('.html') || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request).then(response => {
         if (response.ok) {
